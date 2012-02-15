@@ -1,2 +1,2 @@
-require 'gridfs-serve-image-middleware/version'
-require 'gridfs-serve-image-middleware/gridfs-serve-image'
+require 'serve-gridfs-image-middleware/version'
+require 'serve-gridfs-image-middleware/serve-gridfs-image'
