@@ -1,2 +1,5 @@
 *~
 /pkg/*.gem
+/*.iml
+/.bundle
+/.rakeTasks
