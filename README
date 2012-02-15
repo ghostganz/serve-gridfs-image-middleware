@@ -1,2 +1,7 @@
 This is a Gem packaging of Antek Piechnik's code for serving images from GridFS. Originally found here:
 http://antekpiechnik.com/posts/setting-up-carrierwave-file-uploads-using-gridfs-on-rails-3-and-mongoid
+
+Add this in config/application.rb:
+
+  config.middleware.use "ServeGridfsImage"
+
