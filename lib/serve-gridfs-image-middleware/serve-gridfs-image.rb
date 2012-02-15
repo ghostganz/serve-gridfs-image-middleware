@@ -1,20 +1,30 @@
 class ServeGridfsImage
+
+  def self.config
+    @@config ||= default_config.dup
+  end
+
+  def self.default_config
+    { :path => /^\/grid\/(.+)$/,
+      :database => Mongoid.database }
+  end
+
   def initialize(app)
-      @app = app
+    @app = app
   end
 
   def call(env)
-    if env["PATH_INFO"] =~ /^\/grid\/(.+)$/
+    if env["PATH_INFO"] =~ ServeGridfsImage.config[:path]
       process_request(env, $1)
     else
       @app.call(env)
     end
   end
 
-  private  
+  private
   def process_request(env, key)
     begin
-      Mongo::GridFileSystem.new(Mongoid.database).open(key, 'r') do |file|
+      Mongo::GridFileSystem.new(ServeGridfsImage.config[:database]).open(key, 'r') do |file|
         [200, { 'Content-Type' => file.content_type }, [file.read]]
       end
     rescue
