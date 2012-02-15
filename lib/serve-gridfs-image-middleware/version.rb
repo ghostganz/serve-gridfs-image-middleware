@@ -1,3 +1,3 @@
-module ServeImageMiddleware
+module ServeGridfsImageMiddleware
   VERSION = '0.0.1'
 end
