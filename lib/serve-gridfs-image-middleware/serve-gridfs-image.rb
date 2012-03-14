@@ -25,7 +25,9 @@ class ServeGridfsImage
   def process_request(env, key)
     begin
       Mongo::GridFileSystem.new(ServeGridfsImage.config[:database]).open(key, 'r') do |file|
-        [200, { 'Content-Type' => file.content_type }, [file.read]]
+        headers = {'Content-Type' => file.content_type}
+        headers['ETag'] = %{"#{file['md5']}"} if file['md5']
+        [200, headers, [file.read]]
       end
     rescue
       [404, { 'Content-Type' => 'text/plain' }, ['File not found.']]
