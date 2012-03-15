@@ -25,6 +25,13 @@ class ServeGridfsImage
   def process_request(env, key)
     begin
       Mongo::GridFileSystem.new(ServeGridfsImage.config[:database]).open(key, 'r') do |file|
+        if_none_match = env['HTTP_IF_NONE_MATCH']
+        if if_none_match && if_none_match =~ /^\"(.+)\"$/
+          old_md5 = $1
+          if file['md5'] == old_md5
+            return [304, {}, '']
+          end
+        end
         headers = {'Content-Type' => file.content_type}
         headers['ETag'] = %{"#{file['md5']}"} if file['md5']
         [200, headers, [file.read]]
