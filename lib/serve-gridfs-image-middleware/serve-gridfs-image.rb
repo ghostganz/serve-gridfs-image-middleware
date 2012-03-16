@@ -32,7 +32,8 @@ class ServeGridfsImage
             return [304, {}, '']
           end
         end
-        headers = {'Content-Type' => file.content_type}
+        headers = {'Content-Type' => file.content_type,
+                   'Content-Length' => file.file_length.to_s}
         headers['ETag'] = %{"#{file['md5']}"} if file['md5']
         [200, headers, [file.read]]
       end
