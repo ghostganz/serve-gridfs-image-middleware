@@ -29,7 +29,7 @@ class ServeGridfsImage
         if if_none_match && if_none_match =~ /^\"(.+)\"$/
           old_md5 = $1
           if file['md5'] == old_md5
-            return [304, {}, '']
+            return [304, {}, ['']]
           end
         end
         headers = {}
