@@ -6,7 +6,8 @@ class ServeGridfsImage
 
   def self.default_config
     { :path => /^\/grid\/(.+)$/,
-      :database => Mongoid.database }
+      :database => Mongoid.database,
+      :response_headers => {} }
   end
 
   def initialize(app)
@@ -32,7 +33,7 @@ class ServeGridfsImage
             return [304, {}, ['']]
           end
         end
-        headers = {}
+        headers = ServeGridfsImage.config[:response_headers].dup
         headers['Content-Type'] = file.content_type if file.content_type
         headers['ETag'] = %{"#{file['md5']}"} if file['md5']
         [200, headers, [file.read]]
