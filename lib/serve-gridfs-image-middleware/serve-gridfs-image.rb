@@ -36,6 +36,7 @@ class ServeGridfsImage
         headers = ServeGridfsImage.config[:response_headers].dup
         headers['Content-Type'] = file.content_type if file.content_type
         headers['ETag'] = %{"#{file['md5']}"} if file['md5']
+	headers['Last-Modified'] = file.upload_date.to_datetime.httpdate if file.upload_date
         [200, headers, [file.read]]
       end
     rescue
