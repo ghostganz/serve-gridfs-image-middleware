@@ -36,11 +36,16 @@ class ServeGridfsImage
         headers = ServeGridfsImage.config[:response_headers].dup
         headers['Content-Type'] = file.content_type if file.content_type
         headers['ETag'] = %{"#{file['md5']}"} if file['md5']
-	headers['Last-Modified'] = file.upload_date.to_datetime.httpdate if file.upload_date
+	last_modified = file.upload_date.to_datetime if file.upload_date
+	if last_modified && last_modified.respond_to?(:httpdate)
+	  headers['Last-Modified'] = last_modified.httpdate
+        end
         [200, headers, [file.read]]
       end
-    rescue
+    rescue Mongo::GridFileNotFound
       [404, { 'Content-Type' => 'text/plain' }, ['File not found.']]
+    rescue
+      [500, { 'Content-Type' => 'text/plain' }, [$!.to_s]]
     end
   end
 end
