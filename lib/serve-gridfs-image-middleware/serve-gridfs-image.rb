@@ -40,7 +40,7 @@ class ServeGridfsImage
 	if last_modified && last_modified.respond_to?(:httpdate)
 	  headers['Last-Modified'] = last_modified.httpdate
         end
-        [200, headers, [file.read]]
+        [200, headers, file]
       end
     rescue Mongo::GridFileNotFound
       [404, { 'Content-Type' => 'text/plain' }, ['File not found.']]
