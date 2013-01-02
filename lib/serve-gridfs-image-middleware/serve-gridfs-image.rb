@@ -1,3 +1,5 @@
+require 'mongoid-grid_fs'
+
 class ServeGridfsImage
 
   def self.config
@@ -6,7 +8,6 @@ class ServeGridfsImage
 
   def self.default_config
     {:path => /^\/grid\/(.+)$/,
-     :database => Mongoid.database,
      :response_headers => {}}
   end
 
@@ -25,26 +26,25 @@ class ServeGridfsImage
   private
   def process_request(env, key)
     begin
-      Mongo::GridFileSystem.new(ServeGridfsImage.config[:database]).open(key, 'r') do |file|
-        if_none_match = env['HTTP_IF_NONE_MATCH']
-        if if_none_match && if_none_match =~ /^\"(.+)\"$/
-          old_md5 = $1
-          if file['md5'] == old_md5
-            return [304, {}, ['']]
-          end
+      file = GridFs[key]
+      return [404, {'Content-Type' => 'text/plain'}, ['File not found.']] unless file
+      if_none_match = env['HTTP_IF_NONE_MATCH']
+      if if_none_match && if_none_match =~ /^\"(.+)\"$/
+        old_md5 = $1
+        if file.md5 == old_md5
+          return [304, {}, ['']]
         end
-        headers = ServeGridfsImage.config[:response_headers].dup
-        headers['Content-Type'] = file.content_type if file.content_type
-        headers['ETag'] = %{"#{file['md5']}"} if file['md5']
-        last_modified = file.upload_date.to_datetime if file.upload_date
-        if last_modified && last_modified.respond_to?(:httpdate)
-          headers['Last-Modified'] = last_modified.httpdate
-        end
-        [200, headers, file]
       end
-    rescue Mongo::GridFileNotFound
-      [404, {'Content-Type' => 'text/plain'}, ['File not found.']]
+      headers = ServeGridfsImage.config[:response_headers].dup
+      headers['Content-Type'] = file.content_type if file.content_type
+      headers['ETag'] = %{"#{file.md5}"} if file.md5
+      #last_modified = file.uploadDate.to_datetime if file.uploadDate
+      #if last_modified && last_modified.respond_to?(:httpdate)
+      #  headers['Last-Modified'] = last_modified.httpdate
+      #end
+      [200, headers, file]
     rescue
+      puts $!.backtrace.join("\n")
       [500, {'Content-Type' => 'text/plain'}, [$!.to_s]]
     end
   end

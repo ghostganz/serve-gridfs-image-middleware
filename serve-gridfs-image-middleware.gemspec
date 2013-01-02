@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob("lib/**/*") + %w(Gemfile serve-gridfs-image-middleware.gemspec)
 
   s.add_runtime_dependency 'rails', '>= 3.0'
-  s.add_runtime_dependency 'mongo'
+  s.add_runtime_dependency 'mongoid-grid_fs'
 end

@@ -1,0 +1,6 @@
+development:
+  sessions:
+    default:
+      database: aman_development
+      hosts:
+        - localhost:27017
