@@ -26,7 +26,7 @@ class ServeGridfsImage
   private
   def process_request(env, key)
     begin
-      file = GridFs[key]
+      file = Mongoid::GridFs[key]
       return [404, {'Content-Type' => 'text/plain'}, ['File not found.']] unless file
       if_none_match = env['HTTP_IF_NONE_MATCH']
       if if_none_match && if_none_match =~ /^\"(.+)\"$/
